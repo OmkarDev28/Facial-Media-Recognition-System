@@ -1,3 +1,4 @@
+<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FMRS - Your Library</title>
  <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&family=VT323&display=swap" rel="stylesheet">    <script src="[https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js](https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js)"></script>    <script src="[https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js](https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js)"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&family=VT323&display=swap" rel="stylesheet">    <script src="[https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js](https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js)"></script>   
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         body { font-family: 'Manrope', sans-serif; background-color: #000000; }
         .font-dotmatrix { font-family: 'VT323', monospace; }
@@ -31,22 +33,27 @@
         <header class="text-center mb-8">
              <div class="flex justify-between items-center">
                 <div class="text-left">
-                    <p class="text-sm text-gray-500">LOGGED IN AS</p>
-                    <p class="text-md text-red-400 font-mono">{{ username }}</p>
+                    <p class="text-sm text-gray-500">STORAGE KEY</p>
+                    <p id="storage-key-display" class="text-md text-red-400 font-mono cursor-pointer" title="Click to copy">{{ storage_key }}</p>
+                     <a href="{{ url_for('select_storage') }}" class="text-xs text-gray-400 hover:underline">Change Storage</a>
                 </div>
                 <h1 class="font-dotmatrix text-6xl md:text-7xl font-bold text-white tracking-widest">F<span class="text-red-500">M</span>RS</h1>
-                <a href="{{ url_for('logout') }}" class="text-gray-400 hover:text-white transition">Logout</a>
+                <div class="text-right">
+                     <p class="text-sm text-gray-500">LOGGED IN AS</p>
+                    <p class="text-md text-red-400 font-mono">{{ username }}</p>
+                    <a href="{{ url_for('logout') }}" class="text-xs text-gray-400 hover:underline">Logout</a>
+                </div>
             </div>
         </header>
 
         <!-- ACTION BUTTONS -->
         <div class="flex flex-col sm:flex-row justify-center items-center gap-6 mb-12">
             <button id="show-upload-modal-btn" class="btn-press w-full sm:w-auto flex items-center justify-center gap-3 font-dotmatrix text-3xl bg-red-600 text-white py-4 px-8 rounded-2xl hover:bg-red-700 transition-all duration-300 transform hover:scale-105">
-                <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                 UPLOAD
             </button>
             <button id="show-retrieve-modal-btn" class="btn-press w-full sm:w-auto flex items-center justify-center gap-3 font-dotmatrix text-3xl bg-white text-black py-4 px-8 rounded-2xl hover:bg-gray-200 transition-all duration-300 transform hover:scale-105">
-                <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
                 RETRIEVE
             </button>
         </div>
@@ -68,7 +75,7 @@
                 <div id="results-placeholder" class="text-gray-400 col-span-full mt-10 space-y-4 text-center">
                     <h3 class="text-xl font-bold text-white">Your storage is ready!</h3>
                      <ol class="list-decimal list-inside text-left max-w-md mx-auto text-gray-300 space-y-2">
-                        <li>Click <strong class="text-red-400">UPLOAD</strong> to add photos to your private library.</li>
+                        <li>Click <strong class="text-red-400">UPLOAD</strong> to add photos to this shared library.</li>
                         <li>Click <strong class="text-white">RETRIEVE</strong> to find your photos using a new selfie.</li>
                     </ol>
                 </div>
@@ -117,6 +124,18 @@
     <script>
     // --- All JavaScript from the previous version goes here, with one modification ---
     // The upload function now updates the image count on the page.
+    
+    // --- New feature: Copy storage key to clipboard ---
+    document.getElementById('storage-key-display').onclick = function() {
+        const keyText = this.innerText;
+        const tempInput = document.createElement('input');
+        document.body.appendChild(tempInput);
+        tempInput.value = keyText;
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        alert('Storage key copied to clipboard!');
+    };
 
     // --- DOM Elements ---
     const uploadModal = document.getElementById('upload-modal');
@@ -350,7 +369,7 @@
                                     <img src="${imgPath}" class="w-full h-full object-cover transition-transform duration-300">
                                     <div class="selection-overlay absolute inset-0 bg-black/50 border-4 border-red-500 items-center justify-center">
                                         <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                                            <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                         </div>
                                     </div>
                                 </label>
