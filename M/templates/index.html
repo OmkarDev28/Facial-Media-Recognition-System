@@ -3,97 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facial Media Recognition System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&family=VT323&display=swap" rel="stylesheet">    <script src="[https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js](https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js)"></script>
-    <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
-    <link rel="preconnect" href="[https://fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
+    <title>FMRS - Your Library</title>
+ <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&family=VT323&display=swap" rel="stylesheet">    <script src="[https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js](https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js)"></script>    <script src="[https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js](https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js)"></script>
     <style>
-        body { 
-            font-family: 'Manrope', sans-serif; 
-            background-color: #000000;
-        }
-        .font-dotmatrix { 
-            font-family: 'VT323', monospace; 
-        }
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.2);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border-left-color: #ef4444; /* red-500 */
-            animation: spin 1s ease infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Modal Animation and Styling */
-        .modal {
-            visibility: hidden; opacity: 0;
-            transition: visibility 0s linear 0.25s, opacity 0.25s ease;
-        }
-        .modal-open {
-            visibility: visible; opacity: 1;
-            transition: visibility 0s linear 0s, opacity 0.25s ease;
-        }
-        .modal-content {
-            transform: translateY(20px);
-            transition: transform 0.25s ease;
-        }
-        .modal-open .modal-content {
-            transform: translateY(0);
-        }
-
-        /* Results Image Animation */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .result-image-container {
-            animation: fadeIn 0.5s ease both;
-        }
-
-        /* Button Press Effect */
-        .btn-press:active {
-            transform: scale(0.97);
-            transition: transform 0.1s ease;
-        }
-
-        /* Selection Styling */
-        .selection-overlay {
-            display: none;
-        }
-        .selection-mode .selection-overlay {
-            display: flex;
-        }
-        .image-checkbox {
-            display: none;
-        }
-        .image-checkbox:checked + .result-image-container .selection-overlay {
-            background-color: rgba(239, 68, 68, 0.5); /* red-500 with opacity */
-        }
-        .image-checkbox:checked + .result-image-container img {
-            transform: scale(1.1);
-        }
+        body { font-family: 'Manrope', sans-serif; background-color: #000000; }
+        .font-dotmatrix { font-family: 'VT323', monospace; }
+        .spinner { border: 4px solid rgba(255, 255, 255, 0.2); width: 36px; height: 36px; border-radius: 50%; border-left-color: #ef4444; animation: spin 1s ease infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .modal { visibility: hidden; opacity: 0; transition: visibility 0s linear 0.25s, opacity 0.25s ease; }
+        .modal-open { visibility: visible; opacity: 1; transition: visibility 0s linear 0s, opacity 0.25s ease; }
+        .modal-content { transform: translateY(20px); transition: transform 0.25s ease; }
+        .modal-open .modal-content { transform: translateY(0); }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .result-image-container { animation: fadeIn 0.5s ease both; }
+        .btn-press:active { transform: scale(0.97); transition: transform 0.1s ease; }
+        .selection-overlay { display: none; }
+        .selection-mode .selection-overlay { display: flex; }
+        .image-checkbox { display: none; }
+        .image-checkbox:checked + .result-image-container .selection-overlay { background-color: rgba(239, 68, 68, 0.5); }
+        .image-checkbox:checked + .result-image-container img { transform: scale(1.1); }
     </style>
 </head>
 <body class="text-gray-200">
 
     <div class="container mx-auto p-4 md:p-8 max-w-6xl">
-        <header class="text-center mb-12">
-            <h1 class="font-dotmatrix text-6xl md:text-7xl font-bold text-white tracking-widest">F<span class="text-red-500">M</span>RS</h1>
-            <p class="text-lg text-gray-400 mt-2">Facial Media Recognition System</p>
+        <header class="text-center mb-8">
+             <div class="flex justify-between items-center">
+                <div class="text-left">
+                    <p class="text-sm text-gray-500">LOGGED IN AS</p>
+                    <p class="text-md text-red-400 font-mono">{{ username }}</p>
+                </div>
+                <h1 class="font-dotmatrix text-6xl md:text-7xl font-bold text-white tracking-widest">F<span class="text-red-500">M</span>RS</h1>
+                <a href="{{ url_for('logout') }}" class="text-gray-400 hover:text-white transition">Logout</a>
+            </div>
         </header>
 
         <!-- ACTION BUTTONS -->
-        <div class="flex justify-center items-center gap-6 mb-12">
-            <button id="show-upload-modal-btn" class="btn-press flex items-center gap-3 font-dotmatrix text-3xl bg-red-600 text-white py-4 px-8 rounded-2xl hover:bg-red-700 transition-all duration-300 transform hover:scale-105">
+        <div class="flex flex-col sm:flex-row justify-center items-center gap-6 mb-12">
+            <button id="show-upload-modal-btn" class="btn-press w-full sm:w-auto flex items-center justify-center gap-3 font-dotmatrix text-3xl bg-red-600 text-white py-4 px-8 rounded-2xl hover:bg-red-700 transition-all duration-300 transform hover:scale-105">
                 <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                 UPLOAD
             </button>
-            <button id="show-retrieve-modal-btn" class="btn-press flex items-center gap-3 font-dotmatrix text-3xl bg-white text-black py-4 px-8 rounded-2xl hover:bg-gray-200 transition-all duration-300 transform hover:scale-105">
+            <button id="show-retrieve-modal-btn" class="btn-press w-full sm:w-auto flex items-center justify-center gap-3 font-dotmatrix text-3xl bg-white text-black py-4 px-8 rounded-2xl hover:bg-gray-200 transition-all duration-300 transform hover:scale-105">
                 <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
                 RETRIEVE
             </button>
@@ -101,32 +53,30 @@
 
         <!-- RESULTS Section -->
         <div class="bg-gray-900/50 backdrop-blur-lg p-6 rounded-3xl border border-gray-800 min-h-[300px]">
-            <div class="flex justify-between items-center mb-4">
+            <div id="results-header" class="flex justify-between items-center mb-4 transition-all duration-300">
                 <h2 class="font-dotmatrix text-4xl text-white">IMAGES:</h2>
+                <div class="text-right">
+                    <p class="text-sm text-gray-500">TOTAL IN LIBRARY</p>
+                    <p id="image-count-display" class="text-lg text-white font-bold">{{ image_count }}</p>
+                </div>
                 <div id="selection-controls" class="hidden items-center gap-4">
-                     <button id="download-btn" class="btn-press flex items-center gap-2 bg-red-600 text-white font-bold py-2 px-4 rounded-full hover:bg-red-700 transition-all">
-                        <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                        Download
-                    </button>
+                     <button id="download-btn" class="btn-press flex items-center gap-2 bg-red-600 text-white font-bold py-2 px-4 rounded-full hover:bg-red-700 transition-all">Download</button>
                     <button id="cancel-selection-btn" class="text-gray-400 hover:text-white">&times; Cancel</button>
                 </div>
-                <button id="select-btn" class="hidden bg-gray-700 text-white font-bold py-2 px-4 rounded-full hover:bg-gray-600 transition-all">Select</button>
             </div>
             <div id="results-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 <div id="results-placeholder" class="text-gray-400 col-span-full mt-10 space-y-4 text-center">
-                    <h3 class="text-xl font-bold text-white">How to use FMRS</h3>
-                    <ol class="list-decimal list-inside text-left max-w-md mx-auto text-gray-300 space-y-2">
-                        <li>Click <strong class="text-red-400">UPLOAD</strong> to add photos to the system's library. The more photos you add, the better the results.</li>
-                        <li>Click <strong class="text-white">RETRIEVE</strong> to open your camera and take a selfie.</li>
-                        <li>The system will find all photos in the library that contain your face.</li>
-                        <li>Once images appear, click <strong class="text-gray-200">Select</strong> to download your favorites.</li>
+                    <h3 class="text-xl font-bold text-white">Your storage is ready!</h3>
+                     <ol class="list-decimal list-inside text-left max-w-md mx-auto text-gray-300 space-y-2">
+                        <li>Click <strong class="text-red-400">UPLOAD</strong> to add photos to your private library.</li>
+                        <li>Click <strong class="text-white">RETRIEVE</strong> to find your photos using a new selfie.</li>
                     </ol>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODALS (Upload, Retrieve, Lightbox) -->
+    <!-- All Modals remain here... -->
     <div id="upload-modal" class="modal fixed z-50 inset-0 flex items-center justify-center bg-black/70 backdrop-blur-lg">
         <div class="modal-content bg-gray-900/80 rounded-3xl border border-gray-800 w-full max-w-md p-8">
             <div class="flex justify-between items-center mb-4">
@@ -140,7 +90,6 @@
             <div id="upload-status" class="mt-4 text-center h-10 flex items-center justify-center"></div>
         </div>
     </div>
-
     <div id="retrieve-modal" class="modal fixed z-50 inset-0 flex items-center justify-center bg-black/70 backdrop-blur-lg">
         <div class="modal-content bg-gray-900/80 rounded-3xl border border-gray-800 w-full max-w-md p-8">
             <div class="flex justify-between items-center mb-4">
@@ -160,284 +109,313 @@
              <button id="retake-btn" class="w-full mt-2 text-gray-400 hover:text-white transition hidden">Retake</button>
         </div>
     </div>
-
     <div id="lightbox-modal" class="modal fixed z-50 inset-0 flex items-center justify-center bg-black/80 backdrop-blur-lg p-4">
         <button class="close-btn absolute top-4 right-6 text-white text-5xl font-bold">&times;</button>
         <img id="lightbox-image" src="" class="max-w-full max-h-full object-contain">
     </div>
 
-
     <script>
-        // --- DOM Elements ---
-        const uploadModal = document.getElementById('upload-modal');
-        const retrieveModal = document.getElementById('retrieve-modal');
-        const lightboxModal = document.getElementById('lightbox-modal');
-        const resultsContainer = document.getElementById('results-container');
-        const selectBtn = document.getElementById('select-btn');
-        const selectionControls = document.getElementById('selection-controls');
-        const cancelSelectionBtn = document.getElementById('cancel-selection-btn');
-        const downloadBtn = document.getElementById('download-btn');
-        const showUploadBtn = document.getElementById('show-upload-modal-btn');
-        const showRetrieveBtn = document.getElementById('show-retrieve-modal-btn');
-        
-        // Camera Elements
-        const cameraFeed = document.getElementById('camera-feed');
-        const captureCanvas = document.getElementById('capture-canvas');
-        const selfiePreview = document.getElementById('selfie-preview');
-        const captureBtn = document.getElementById('capture-btn');
-        const searchBtn = document.getElementById('search-btn');
-        const retakeBtn = document.getElementById('retake-btn');
-        const retrieveStatus = document.getElementById('retrieve-status');
-        let cameraStream = null;
+    // --- All JavaScript from the previous version goes here, with one modification ---
+    // The upload function now updates the image count on the page.
+
+    // --- DOM Elements ---
+    const uploadModal = document.getElementById('upload-modal');
+    const retrieveModal = document.getElementById('retrieve-modal');
+    const lightboxModal = document.getElementById('lightbox-modal');
+    const resultsContainer = document.getElementById('results-container');
+    const resultsHeader = document.getElementById('results-header');
+    const selectionControls = document.getElementById('selection-controls');
+    const cancelSelectionBtn = document.getElementById('cancel-selection-btn');
+    const downloadBtn = document.getElementById('download-btn');
+    const showUploadBtn = document.getElementById('show-upload-modal-btn');
+    const showRetrieveBtn = document.getElementById('show-retrieve-modal-btn');
+    const imageCountDisplay = document.getElementById('image-count-display');
+    
+    // Camera Elements
+    const cameraFeed = document.getElementById('camera-feed');
+    const captureCanvas = document.getElementById('capture-canvas');
+    const selfiePreview = document.getElementById('selfie-preview');
+    const captureBtn = document.getElementById('capture-btn');
+    const searchBtn = document.getElementById('search-btn');
+    const retakeBtn = document.getElementById('retake-btn');
+    const retrieveStatus = document.getElementById('retrieve-status');
+    let cameraStream = null;
 
 
-        // --- Modal Handling ---
-        const openModal = (modal) => modal.classList.add('modal-open');
-        const closeModal = (modal) => {
-            modal.classList.remove('modal-open');
-            if (modal === retrieveModal) {
-                stopCamera();
-            }
-        };
-
-        showUploadBtn.onclick = () => {
-            const uploadSubmitBtn = document.querySelector('#upload-form button[type="submit"]');
-            uploadSubmitBtn.classList.remove('bg-green-600');
-            uploadSubmitBtn.classList.add('bg-red-600', 'hover:bg-red-700');
-            uploadSubmitBtn.innerHTML = 'Upload and Process';
-            uploadSubmitBtn.disabled = false;
-            document.getElementById('upload-status').innerHTML = '';
-            document.getElementById('upload-form').reset();
-            openModal(uploadModal);
-        };
-
-        showRetrieveBtn.onclick = () => {
-            openModal(retrieveModal);
-            startCamera();
-            selfiePreview.classList.add('hidden');
-            cameraFeed.classList.remove('hidden');
-            captureBtn.classList.remove('hidden');
-            searchBtn.classList.add('hidden');
-            retakeBtn.classList.add('hidden');
-            retrieveStatus.innerHTML = '';
-        };
-        
-        document.querySelectorAll('.close-btn').forEach(btn => btn.onclick = () => {
-            closeModal(uploadModal);
-            closeModal(retrieveModal);
-            closeModal(lightboxModal);
-        });
-        window.onclick = (event) => {
-            if (event.target == uploadModal) closeModal(uploadModal);
-            if (event.target == retrieveModal) closeModal(retrieveModal);
-            if (event.target == lightboxModal) closeModal(lightboxModal);
-        };
-
-        // --- Camera Functions ---
-        async function startCamera() {
-            if (cameraStream) {
-                stopCamera();
-            }
-            try {
-                cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
-                cameraFeed.srcObject = cameraStream;
-            } catch (err) {
-                console.error("Error accessing camera: ", err);
-                retrieveStatus.innerHTML = `<p class="text-red-400">Could not access camera.</p>`;
-            }
-        }
-
-        function stopCamera() {
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
-                cameraStream = null;
-            }
-        }
-
-        captureBtn.onclick = () => {
-            const context = captureCanvas.getContext('2d');
-            captureCanvas.width = cameraFeed.videoWidth;
-            captureCanvas.height = cameraFeed.videoHeight;
-            context.drawImage(cameraFeed, 0, 0, captureCanvas.width, captureCanvas.height);
-            
-            selfiePreview.src = captureCanvas.toDataURL('image/jpeg');
-            selfiePreview.classList.remove('hidden');
-            cameraFeed.classList.add('hidden');
-
-            captureBtn.classList.add('hidden');
-            searchBtn.classList.remove('hidden');
-            retakeBtn.classList.remove('hidden');
+    // --- Modal Handling ---
+    const openModal = (modal) => modal.classList.add('modal-open');
+    const closeModal = (modal) => {
+        modal.classList.remove('modal-open');
+        if (modal === retrieveModal) {
             stopCamera();
-        };
+        }
+    };
 
-        retakeBtn.onclick = () => {
-            startCamera();
-            selfiePreview.classList.add('hidden');
-            cameraFeed.classList.remove('hidden');
-            captureBtn.classList.remove('hidden');
-            searchBtn.classList.add('hidden');
-            retakeBtn.classList.add('hidden');
-        };
+    showUploadBtn.onclick = () => {
+        const uploadSubmitBtn = document.querySelector('#upload-form button[type="submit"]');
+        uploadSubmitBtn.classList.remove('bg-green-600');
+        uploadSubmitBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+        uploadSubmitBtn.innerHTML = 'Upload and Process';
+        uploadSubmitBtn.disabled = false;
+        document.getElementById('upload-status').innerHTML = '';
+        document.getElementById('upload-form').reset();
+        openModal(uploadModal);
+    };
 
-        // --- Selection Mode ---
-        let selectionMode = false;
-        selectBtn.onclick = () => {
-            selectionMode = true;
-            resultsContainer.classList.add('selection-mode');
-            selectBtn.classList.add('hidden');
-            selectionControls.classList.remove('hidden');
-            selectionControls.classList.add('flex');
-        };
-        cancelSelectionBtn.onclick = () => {
-            selectionMode = false;
-            resultsContainer.classList.remove('selection-mode');
-            selectBtn.classList.remove('hidden');
-            selectionControls.classList.add('hidden');
-            selectionControls.classList.remove('flex');
-            document.querySelectorAll('.image-checkbox').forEach(cb => cb.checked = false);
-        };
+    showRetrieveBtn.onclick = () => {
+        openModal(retrieveModal);
+        startCamera();
+        selfiePreview.classList.add('hidden');
+        cameraFeed.classList.remove('hidden');
+        captureBtn.classList.remove('hidden');
+        searchBtn.classList.add('hidden');
+        retakeBtn.classList.add('hidden');
+        retrieveStatus.innerHTML = '';
+    };
+    
+    document.querySelectorAll('.close-btn').forEach(btn => btn.onclick = () => {
+        closeModal(uploadModal);
+        closeModal(retrieveModal);
+        closeModal(lightboxModal);
+    });
+    window.onclick = (event) => {
+        if (event.target == uploadModal) closeModal(uploadModal);
+        if (event.target == retrieveModal) closeModal(retrieveModal);
+        if (event.target == lightboxModal) closeModal(lightboxModal);
+    };
 
-        // --- Image Click Handling ---
-        function handleImageClick(event) {
-            if (selectionMode) {
-                const checkbox = event.currentTarget.previousElementSibling;
-                checkbox.checked = !checkbox.checked;
-            } else {
-                document.getElementById('lightbox-image').src = event.currentTarget.querySelector('img').src;
-                openModal(lightboxModal);
+    // --- Camera Functions ---
+    async function startCamera() {
+        if (cameraStream) stopCamera();
+        try {
+            cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            cameraFeed.srcObject = cameraStream;
+        } catch (err) {
+            console.error("Error accessing camera: ", err);
+            retrieveStatus.innerHTML = `<p class="text-red-400">Could not access camera.</p>`;
+        }
+    }
+
+    function stopCamera() {
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+            cameraStream = null;
+        }
+    }
+
+    captureBtn.onclick = () => {
+        const context = captureCanvas.getContext('2d');
+        captureCanvas.width = cameraFeed.videoWidth;
+        captureCanvas.height = cameraFeed.videoHeight;
+        context.drawImage(cameraFeed, 0, 0, captureCanvas.width, captureCanvas.height);
+        
+        selfiePreview.src = captureCanvas.toDataURL('image/jpeg');
+        selfiePreview.classList.remove('hidden');
+        cameraFeed.classList.add('hidden');
+
+        captureBtn.classList.add('hidden');
+        searchBtn.classList.remove('hidden');
+        retakeBtn.classList.remove('hidden');
+        stopCamera();
+    };
+
+    retakeBtn.onclick = () => {
+        startCamera();
+        selfiePreview.classList.add('hidden');
+        cameraFeed.classList.remove('hidden');
+        captureBtn.classList.remove('hidden');
+        searchBtn.classList.add('hidden');
+        retakeBtn.classList.add('hidden');
+    };
+
+    // --- Selection Mode & Long Press ---
+    let selectionMode = false;
+    let pressTimer;
+
+    function startPress(event) {
+        if (resultsContainer.querySelector('.result-image-container') === null) return;
+        
+        pressTimer = setTimeout(() => {
+            event.preventDefault();
+            enterSelectionMode(event.currentTarget);
+        }, 500);
+    }
+
+    function cancelPress() {
+        clearTimeout(pressTimer);
+    }
+
+    function enterSelectionMode(targetElement) {
+        if (selectionMode) return;
+        selectionMode = true;
+        resultsContainer.classList.add('selection-mode');
+        resultsHeader.querySelector('h2').classList.add('hidden');
+        selectionControls.classList.remove('hidden');
+        selectionControls.classList.add('flex');
+        const checkbox = targetElement.previousElementSibling;
+        checkbox.checked = true;
+    }
+
+    cancelSelectionBtn.onclick = () => {
+        selectionMode = false;
+        resultsContainer.classList.remove('selection-mode');
+        resultsHeader.querySelector('h2').classList.remove('hidden');
+        selectionControls.classList.add('hidden');
+        selectionControls.classList.remove('flex');
+        document.querySelectorAll('.image-checkbox').forEach(cb => cb.checked = false);
+    };
+
+    // --- Image Click Handling ---
+    function handleImageClick(event) {
+        clearTimeout(pressTimer);
+        if (selectionMode) {
+            const checkbox = event.currentTarget.previousElementSibling;
+            if (checkbox.checked && document.querySelectorAll('.image-checkbox:checked').length === 1) {
+                 const isInitiatingClick = !event.detail || event.detail === 1;
+                 if(isInitiatingClick) return;
+            }
+            checkbox.checked = !checkbox.checked;
+        } else {
+            document.getElementById('lightbox-image').src = event.currentTarget.querySelector('img').src;
+            openModal(lightboxModal);
+        }
+    }
+
+    // --- Form Submission: Library Upload with Progress ---
+    document.getElementById('upload-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const statusDiv = document.getElementById('upload-status');
+        const files = document.getElementById('upload-files').files;
+        const submitBtn = this.querySelector('button[type="submit"]');
+        let totalFacesFound = 0;
+        let finalImageCount = 0;
+
+        submitBtn.disabled = true;
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const formData = new FormData();
+            formData.append('files', file);
+            
+            statusDiv.innerHTML = `<div class="spinner mx-auto"></div><p class="mt-2 text-sm">Processing ${i + 1} of ${files.length}...</p>`;
+
+            try {
+                const response = await fetch('/upload', { method: 'POST', body: formData });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'A server error occurred.');
+                totalFacesFound += parseInt(result.message.split(' ')[0]) || 0;
+                finalImageCount = result.image_count; // Get updated count from server
+            } catch (error) {
+                statusDiv.innerHTML = `<p class="text-red-400">Error on ${file.name}: ${error.message}</p>`;
+                await new Promise(resolve => setTimeout(resolve, 2000));
             }
         }
 
-        // --- Form Submission: Library Upload with Progress ---
-        document.getElementById('upload-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const statusDiv = document.getElementById('upload-status');
-            const files = document.getElementById('upload-files').files;
-            const submitBtn = this.querySelector('button[type="submit"]');
-            let totalFacesFound = 0;
+        statusDiv.innerHTML = `<p class="text-green-400">Complete. Found ${totalFacesFound} faces.</p>`;
+        imageCountDisplay.innerText = finalImageCount; // Update the count on the main page
+        submitBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+        submitBtn.classList.add('bg-green-600');
+        submitBtn.innerHTML = 'Done';
+        
+        setTimeout(() => closeModal(uploadModal), 2000);
+    });
 
-            submitBtn.disabled = true;
+    // --- Form Submission: Selfie Search via Camera ---
+    searchBtn.onclick = async () => {
+        const placeholder = document.getElementById('results-placeholder');
+        
+        retrieveStatus.innerHTML = '<div class="spinner mx-auto"></div>';
+        resultsContainer.innerHTML = '';
+        if(placeholder) placeholder.style.display = 'none';
+        cancelSelectionBtn.click();
 
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const formData = new FormData();
-                formData.append('files', file);
-                
-                statusDiv.innerHTML = `<div class="spinner mx-auto"></div><p class="mt-2 text-sm">Processing ${i + 1} of ${files.length}...</p>`;
-
-                try {
-                    const response = await fetch('/upload', { method: 'POST', body: formData });
-                    const result = await response.json();
-                    if (!response.ok) {
-                        throw new Error(result.error || 'A server error occurred.');
-                    }
-                    const facesInFile = parseInt(result.message.split(' ')[0]) || 0;
-                    totalFacesFound += facesInFile;
-                } catch (error) {
-                    statusDiv.innerHTML = `<p class="text-red-400">Error processing ${file.name}: ${error.message}</p>`;
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                }
-            }
-
-            statusDiv.innerHTML = `<p class="text-green-400">Upload complete. Found ${totalFacesFound} total faces.</p>`;
-            submitBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
-            submitBtn.classList.add('bg-green-600');
-            submitBtn.innerHTML = 'Done';
+        captureCanvas.toBlob(async (blob) => {
+            const formData = new FormData();
+            formData.append('selfie', blob, 'selfie.jpg');
             
-            setTimeout(() => closeModal(uploadModal), 2000);
-        });
-
-        // --- Form Submission: Selfie Search via Camera ---
-        searchBtn.onclick = async () => {
-            const placeholder = document.getElementById('results-placeholder');
-            
-            retrieveStatus.innerHTML = '<div class="spinner mx-auto"></div>';
-            resultsContainer.innerHTML = '';
-            if(placeholder) placeholder.style.display = 'none';
-            cancelSelectionBtn.click();
-
-            captureCanvas.toBlob(async (blob) => {
-                const formData = new FormData();
-                formData.append('selfie', blob, 'selfie.jpg');
+            try {
+                const response = await fetch('/search', { method: 'POST', body: formData });
+                const result = await response.json();
                 
-                try {
-                    const response = await fetch('/search', { method: 'POST', body: formData });
-                    const result = await response.json();
-                    
-                    closeModal(retrieveModal);
-                    retrieveStatus.innerHTML = ''; 
+                closeModal(retrieveModal);
+                retrieveStatus.innerHTML = ''; 
 
-                    if (response.ok) {
-                        if (result.matches && result.matches.length > 0) {
-                            selectBtn.classList.remove('hidden');
-                            result.matches.forEach((imgPath, index) => {
-                                const uniqueId = `img-check-${index}`;
-                                const itemHTML = `
-                                    <input type="checkbox" id="${uniqueId}" class="image-checkbox">
-                                    <label for="${uniqueId}" class="result-image-container block cursor-pointer overflow-hidden rounded-2xl aspect-square relative" style="animation-delay: ${index * 100}ms;">
-                                        <img src="${imgPath}" class="w-full h-full object-cover transition-transform duration-300">
-                                        <div class="selection-overlay absolute inset-0 bg-black/50 border-4 border-red-500 items-center justify-center">
-                                            <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                                                <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                            </div>
+                if (response.ok) {
+                    if (result.matches && result.matches.length > 0) {
+                        result.matches.forEach((imgPath, index) => {
+                            const uniqueId = `img-check-${index}`;
+                            const itemHTML = `
+                                <input type="checkbox" id="${uniqueId}" class="image-checkbox">
+                                <label for="${uniqueId}" class="result-image-container block cursor-pointer overflow-hidden rounded-2xl aspect-square relative" style="animation-delay: ${index * 100}ms;">
+                                    <img src="${imgPath}" class="w-full h-full object-cover transition-transform duration-300">
+                                    <div class="selection-overlay absolute inset-0 bg-black/50 border-4 border-red-500 items-center justify-center">
+                                        <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                                            <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                         </div>
-                                    </label>
-                                `;
-                                resultsContainer.innerHTML += itemHTML;
-                            });
-                            document.querySelectorAll('.result-image-container').forEach(el => el.addEventListener('click', handleImageClick));
-                        } else {
-                            selectBtn.classList.add('hidden');
-                            resultsContainer.innerHTML = `<p class="text-gray-400 text-center col-span-full mt-10">${result.message || 'No matches found.'}</p>`;
-                        }
+                                    </div>
+                                </label>
+                            `;
+                            resultsContainer.innerHTML += itemHTML;
+                        });
+                        document.querySelectorAll('.result-image-container').forEach(el => {
+                            el.addEventListener('click', handleImageClick);
+                            el.addEventListener('mousedown', startPress);
+                            el.addEventListener('touchstart', startPress, {passive: true});
+                            el.addEventListener('mouseup', cancelPress);
+                            el.addEventListener('mouseleave', cancelPress);
+                            el.addEventListener('touchend', cancelPress);
+                            el.addEventListener('touchmove', cancelPress, {passive: true});
+                        });
                     } else {
-                         resultsContainer.innerHTML = `<p class="text-red-400 text-center col-span-full mt-10">Error: ${result.error}</p>`;
+                        resultsContainer.innerHTML = `<p class="text-gray-400 text-center col-span-full mt-10">${result.message || 'No matches found.'}</p>`;
                     }
-                } catch (error) {
-                    closeModal(retrieveModal);
-                    retrieveStatus.innerHTML = '';
-                    resultsContainer.innerHTML = `<p class="text-red-400 text-center col-span-full mt-10">An unexpected error occurred.</p>`;
+                } else {
+                     resultsContainer.innerHTML = `<p class="text-red-400 text-center col-span-full mt-10">Error: ${result.error}</p>`;
                 }
-            }, 'image/jpeg');
-        };
-
-        // --- Download Selected Images ---
-        downloadBtn.onclick = async () => {
-            const selectedCheckboxes = document.querySelectorAll('.image-checkbox:checked');
-            if (selectedCheckboxes.length === 0) {
-                alert("Please select at least one image to download.");
-                return;
+            } catch (error) {
+                closeModal(retrieveModal);
+                retrieveStatus.innerHTML = '';
+                resultsContainer.innerHTML = `<p class="text-red-400 text-center col-span-full mt-10">An unexpected error occurred.</p>`;
             }
+        }, 'image/jpeg');
+    };
 
-            downloadBtn.innerHTML = '<div class="spinner mx-auto"></div>';
-            const zip = new JSZip();
-            const promises = [];
+    // --- Download Selected Images ---
+    downloadBtn.onclick = async () => {
+        const selectedCheckboxes = document.querySelectorAll('.image-checkbox:checked');
+        if (selectedCheckboxes.length === 0) {
+            alert("Please select at least one image to download.");
+            return;
+        }
 
-            selectedCheckboxes.forEach(cb => {
-                const imgUrl = cb.nextElementSibling.querySelector('img').src;
-                const filename = imgUrl.split('/').pop();
-                
-                const promise = fetch(imgUrl)
-                    .then(response => response.blob())
-                    .then(blob => {
-                        zip.file(filename, blob);
-                    });
-                promises.push(promise);
-            });
+        downloadBtn.innerHTML = '<div class="spinner mx-auto"></div>';
+        const zip = new JSZip();
+        const promises = [];
 
-            await Promise.all(promises);
-            zip.generateAsync({type:"blob"}).then(function(content) {
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(content);
-                link.download = "FMRS_images.zip";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                downloadBtn.innerHTML = 'Download';
-                cancelSelectionBtn.click();
-            });
-        };
+        selectedCheckboxes.forEach(cb => {
+            const imgUrl = cb.nextElementSibling.querySelector('img').src;
+            const filename = imgUrl.split('/').pop();
+            
+            const promise = fetch(imgUrl)
+                .then(response => response.blob())
+                .then(blob => {
+                    zip.file(filename, blob);
+                });
+            promises.push(promise);
+});
+
+        await Promise.all(promises);
+        zip.generateAsync({type:"blob"}).then(function(content) {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(content);
+            link.download = "FMRS_images.zip";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            downloadBtn.innerHTML = 'Download';
+            cancelSelectionBtn.click();
+        });
+    };
     </script>
-
 </body>
 </html>
