@@ -1,0 +1,9 @@
+# Ignore the SQLite database
+photolib.db
+
+# Ignore user-uploaded files
+static/uploads/
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
