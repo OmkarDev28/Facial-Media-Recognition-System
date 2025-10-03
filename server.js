@@ -2,6 +2,7 @@ import express from "express";
 import './backend/config/db.js';
 import userRoutes from "./backend/routes/authRoutes.js";
 import mediaRoutes from "./backend/routes/mediaRoutes.js"
+import eventRoutes from "./backend/routes/eventRoutes.js"
 import passport from "passport";
 import pkg from "passport-jwt";
 
@@ -15,6 +16,7 @@ app.use(express.json());
 
 app.use('/api', userRoutes);
 app.use('/api', mediaRoutes);
+app.use('/api', eventRoutes)
 
 
 const opts = {
