@@ -7,12 +7,10 @@ const router = express.Router();
 // ----------------------
 // Protected Upload Route
 // ----------------------
-router.post(
-  "/media/upload",
-  passport.authenticate("jwt", { session: false }), // ✅ Protect this route
+router.post("/media/upload", passport.authenticate("jwt", { session: false }), // ✅ Protect this route
   async (req, res) => {
     try {
-      const userId = req.user.id; // comes from JWT payload
+      const userId = req.user.id; 
       const { fileUrl, description, file_type } = req.body; // example data
 
       // insert into DB
@@ -31,5 +29,26 @@ router.post(
     }
   }
 );
+
+router.post("/media/list", passport.authenticate("jwt", { session: false }), // ✅ Protect this route
+  async (req, res) => {
+    
+    try{
+      const userId = req.user.id;
+
+      const result = await pool.query(
+        "SELECT * FROM media WHERE user_id = $1",
+        [userId]
+      );
+
+      res.status(201).json({
+        message: "Media listed",
+        media: result,
+      });
+    } catch (err) {
+      console.error("Upload error:", err);
+      res.status(500).json({ error: "Server error" });
+    }
+  })
 
 export default router;
