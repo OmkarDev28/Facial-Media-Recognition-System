@@ -1,12 +1,15 @@
 import express from 'express';
 import pool from '../config/db.js';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 
+// ----------------------
 // REGISTER
+// ----------------------
 router.post('/register', async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, email } = req.body;
 
     try {
         // check if user exists
@@ -23,12 +26,20 @@ router.post('/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = await pool.query(
-            'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *',
-            [username, hashedPassword]
+            'INSERT INTO users (username, password, email) VALUES ($1, $2, $3) RETURNING *',
+            [username, hashedPassword, email]
+        );
+
+        // create JWT for new user
+        const token = jwt.sign(
+            { id: newUser.rows[0].id, username: newUser.rows[0].username },
+            process.env.JWT_SECRET || "yoursecretkey",
+            { expiresIn: "1h" }
         );
 
         res.status(201).json({
             message: 'User registered successfully',
+            token,
             user: { id: newUser.rows[0].id, username: newUser.rows[0].username }
         });
     } catch (err) {
@@ -37,7 +48,9 @@ router.post('/register', async (req, res) => {
     }
 });
 
+// ----------------------
 // LOGIN
+// ----------------------
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -59,8 +72,16 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'Invalid Credentials' });
         }
 
+        // ✅ create JWT
+        const token = jwt.sign(
+            { id: user.id, username: user.username },
+            process.env.JWT_SECRET || "yoursecretkey",
+            { expiresIn: "1h" }
+        );
+
         res.json({
             message: 'Login Successful',
+            token,
             user: { id: user.id, username: user.username }
         });
     } catch (err) {
