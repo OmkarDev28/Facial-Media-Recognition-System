@@ -1,45 +1,36 @@
 import express from "express";
-import './backend/config/db.js';
-import userRoutes from "./backend/routes/authRoutes.js";
-import mediaRoutes from "./backend/routes/mediaRoutes.js"
-import eventRoutes from "./backend/routes/eventRoutes.js"
-import passport from "passport";
-import pkg from "passport-jwt";
-
-const { Strategy: JwtStrategy, ExtractJwt } = pkg;
-
+import session from "express-session"; // 1. Import express-session
+import './backend/API/config/db.js';
+import authRoutesAPI from "./backend/API/routes/authRoutesAPI.js";
+import mediaRoutesAPI from "./backend/API/routes/mediaRoutesAPI.js"
+import eventRoutesAPI from "./backend/API/routes/eventRoutesAPI.js";
+import userRoutesAPI from "./backend/API/routes/userRoutesAPI.js";
 
 const app = express();
 const Port = 3000;
 
 app.use(express.json());
 
-app.use('/api', userRoutes);
-app.use('/api', mediaRoutes);
-app.use('/api', eventRoutes)
 
+app.use(session({
+    
+    secret: process.env.SESSION_SECRET || "your-super-secret-key-for-sessions",
+    resave: false, 
+    saveUninitialized: true, 
+    cookie: {
+        secure: process.env.NODE_ENV === "production", 
+        maxAge: 1000 * 60 * 60 * 24 
+    }
+}));
 
-const opts = {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: process.env.JWT_SECRET || "yoursecretkey" // put secret in .env
-};
+// Your routes can now use req.session to store user data
+app.use('/api', authRoutesAPI);
+app.use('/api', mediaRoutesAPI);
+app.use('/api', eventRoutesAPI);
+app.use('/api', userRoutesAPI);
 
-passport.use(
-    new JwtStrategy(opts, (jwt_payload, done) => {
-        try {
-            // jwt_payload will contain user data you signed (ex: { id, email })
-            // Here you could also fetch user from DB if needed
-            return done(null, jwt_payload);
-        } catch (err) {
-            return done(err, false);
-        }
-    })
-);
-
-// Initialize Passport
-app.use(passport.initialize());
-
+// --- All Passport and JWT related code has been removed ---
 
 app.listen(3000, () => {
     console.log(`Listening on port ${Port}`);
-})
+});
